@@ -1,0 +1,110 @@
+<form action="enregistrement.php" class="form-signin" method="post"  onsubmit="return verifForm(this);">
+
+                <h1 class="h3 mb-3 font-weight-normal"> Formulaire D'enregistrement</h1>
+                <p>Zone de saisie :</p>
+                <div>
+                    <label class="sr-only" > Nom : </label>
+                    <input type="text" class="form-control" placeholder="Votre Nom" name="nom" id="name" required/>
+                </div>
+                <div>
+                    <label class="sr-only"> Prenom : </label>
+                    <input type="text"  class="form-control" placeholder="Votre Prénom" name="prenom" id="prenom" required/>
+
+                </div>
+                <div>
+                    <label class="sr-only"> Email : </label>
+                    <input type="text" class="form-control" placeholder="Votre Email"name="mail" id="mail" required /></br>
+                </div>
+                <div>
+                    <label class="sr-only"> Credit : </label>
+                    <input type="text" class="form-control" placeholder="Votre Credit"name="credit" id="credit" required /></br>
+                </div>
+                <div>
+                    <label class="sr-only"> Mot de Passe  : </label>
+                    <input type="text" class="form-control" placeholder="Votre Mot de passe"name="pwd" id="pwd" required />
+
+                </div>
+                <div>
+                    <label class="sr-only"> Confirmation Mdp  : </label>
+                    <input type="text" name="cpwd" class="form-control" placeholder="Confirmation Mdp" id="cpwd" required/></br>
+                </div>
+
+
+                <button class="btn btn-lg btn-primary btn-block" type="submit" >Valider</button>
+        </form>
+[01:21]
+tu ajoute le input credit
+[01:21]
+dans ta page d'enregistrement.php
+[01:21]
+tu recup
+[01:21]
+if(!empty($_POST['nom'])&&!empty($_POST['prenom'])&&!empty($_POST['mail'])&&!empty($_POST['pwd'])&&!empty($_POST['cpwd'])){
+        if($_POST['pwd']===$_POST['cpwd']){
+            $database = new PDO('mysql:host=localhost;dbname=achat_en_ligne','root','');
+            $nom=$_POST['nom'];
+            $prenom=$_POST['prenom'];
+            $email=$_POST['mail'];
+            $montant = intval($_POST['credit']);
+[01:22]
+tu linser dans ta table
+[01:22]
+$client = $database->prepare('INSERT INTO connexions(nom, prenom,email, mdp,montant) VALUES(:nom, :prenom,:email , :mdp,:montant)');
+            $client ->execute(array(
+                'nom'=>$nom,
+                'prenom'=>$prenom,
+                'email'=>$email,
+                'mdp'=>$hmdp,
+                'montant'=>$montant
+            ));
+[01:22]
+tu creer dans ta base de donne la table compteelect
+[01:23]
+et tu fais la jointure entre connexion et compteelect
+[01:24]
+dans ta connection  $logg = "'".$_SESSION['log']."'";
+[01:24]
+tu ajoute la requete
+[01:24]
+if(isset($_POST['genre'])&&isset($_POST['vetement'])&&isset($_POST['taille'])&&isset($_POST['couleur'])&&isset($_POST['qte'])&&isset($_POST['achat'])){
+            echo $_POST['genre']."<br>";
+            echo $_POST['vetement']."<br>";
+            echo $_POST['taille']."<br>";
+            echo $_POST['couleur']."<br>";
+            echo $_POST['qte']."<br>";
+        $stockss = $database->prepare('SELECT * FROM stock WHERE genre='.$_POST['genre'].' AND typeVetement='.$_POST['vetement'].' AND taille='.$_POST['taille'].' AND couleur='.$_POST['couleur']);
+            $executeIsOk = $stockss ->execute();
+
+            $stocksss = $stockss->fetchAll();
+
+            foreach ($stocksss as $zak): 
+
+
+
+                    echo $zak['id'];
+                        $p=intval($_POST['qte']);
+                        $z=intval($zak['id']);
+                        echo $p;
+                        echo $z;
+                        var_dump($z);
+                        $pr=$zak['prixUnitaire'];
+                       $quant = $database->prepare("UPDATE stock set quantite=(quantite-$p) WHERE id=$z");
+
+
+
+
+           endforeach;
+           /*compta */
+            $compta= $database->prepare("SELECT * FROM compteelect WHERE login =".$logg);
+            $executeIsOk = $compta ->execute();
+
+            $comptabilite = $compta ->fetchAll();
+            foreach ($comptabilite as $comptza):
+                if($comptza['montant']>$pr){
+                    $c = $database->prepare("UPDATE compteelect set montant=(montant-".$pr.") WHERE login=".$logg);
+                    $ccc = $c->execute();
+                    $executeIsOk = $quant->execute();
+                }else {
+                    echo "<h1>Desolé le montant de votre credit n'es pas suffisant</h1>";
+                }
+            endforeach;
